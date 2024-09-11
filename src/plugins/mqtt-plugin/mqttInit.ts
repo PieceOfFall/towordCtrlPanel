@@ -46,6 +46,7 @@ export default class MQTT implements MqttInterface {
    * vue插件入口函数
    * @param _app vue实例
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public install(_app: App) {
     console.log('MQTT Loaded')
   }
