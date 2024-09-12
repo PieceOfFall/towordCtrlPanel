@@ -1,13 +1,14 @@
-import type { ClientSubscribeCallback, MqttClient } from 'mqtt'
-import type { App } from 'vue'
+import type { MqttClient } from 'mqtt'
+import type { ObjectPlugin } from 'vue'
 
-export interface MqttInterface {
+export interface MqttInterface extends ObjectPlugin {
   publish(topic: string, payload: object | string): MqttClient
-  subscribe(topic: string | string[], cb: ClientSubscribeCallback): MqttClient
-  install(app: App): void
+  subscribe(topic: string | string[], qos?: 0 | 1 | 2, cb?: OnMessageStringCb): MqttClient
 }
 
 export interface MqttOptions {
   address: string
-  subscribe?: Record<string, ClientSubscribeCallback>
+  subscribe?: Record<string, OnMessageStringCb>
 }
+
+export type OnMessageStringCb = (topic: string, payload: string) => void

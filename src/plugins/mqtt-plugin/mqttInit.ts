@@ -1,5 +1,5 @@
-import type { MqttInterface, MqttOptions } from './types'
-import type { MqttClient, ClientSubscribeCallback } from 'mqtt'
+import type { MqttInterface, MqttOptions, OnMessageStringCb } from './types'
+import type { MqttClient } from 'mqtt'
 import mqtt from 'mqtt'
 import type { App } from 'vue'
 
@@ -7,15 +7,31 @@ import type { App } from 'vue'
  * MQTT实例
  */
 export default class MQTT implements MqttInterface {
-  readonly client: MqttClient
-  readonly subscribeSet: Set<string> = new Set()
+  public readonly client: MqttClient
+
+  /**
+   * 订阅的所有主题
+   */
+  public get subscribeList() {
+    return Object.keys(this.subscribeRecord)
+  }
+
+  /**
+   * 订阅的主题和对应的消息处理回调
+   */
+  private readonly subscribeRecord: Record<string, OnMessageStringCb>
 
   constructor(options: MqttOptions) {
     this.client = mqtt.connect(options.address)
+    this.subscribeRecord = options.subscribe || {}
+
     if (options.subscribe) {
-      for (const [topic, cb] of Object.entries(options.subscribe)) {
-        this.subscribe(topic, cb)
-      }
+      Object.keys(options.subscribe).forEach((topic) => this.subscribe(topic))
+
+      this.client.on('message', (topic, payloadBuffer) => {
+        const cb = this.subscribeRecord![topic]
+        cb(topic, payloadBuffer.toString('utf-8'))
+      })
     }
   }
 
@@ -33,13 +49,23 @@ export default class MQTT implements MqttInterface {
   /**
    * 订阅消息
    * @param topics 主题
+   * @param qos 消息质量
    * @param cb 消息处理回调函数
    * @returns MQTT客户端实例
    */
-  public subscribe(topics: string | string[], cb: ClientSubscribeCallback): MqttClient {
-    if (typeof topics === 'string') this.subscribeSet.add(topics)
-    else topics.forEach((topic) => this.subscribeSet.add(topic))
-    return this.client.subscribe(topics, cb)
+  public subscribe(
+    topics: string | string[],
+    qos: 0 | 1 | 2 = 2,
+    cb?: OnMessageStringCb
+  ): MqttClient {
+    if (cb) {
+      if (typeof topics === 'string') {
+        this.subscribeRecord[topics] = cb
+      } else {
+        topics.forEach((topic) => (this.subscribeRecord[topic] = cb))
+      }
+    }
+    return this.client.subscribe(topics, { qos })
   }
 
   /**
