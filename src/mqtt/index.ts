@@ -1,6 +1,6 @@
 import { createMqtt } from '@/plugins/mqtt-plugin'
 
-const mqtt = createMqtt({
+export default createMqtt({
   address: import.meta.env.VITE_MQTT_ADDRESS,
   subscribe: {
     ctrl: (_topic, payload) => {
@@ -11,5 +11,3 @@ const mqtt = createMqtt({
     }
   }
 })
-
-export default mqtt
