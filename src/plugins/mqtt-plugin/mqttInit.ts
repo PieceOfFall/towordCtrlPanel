@@ -10,26 +10,26 @@ export default class MQTT implements MqttInterface {
   public readonly client: MqttClient
 
   /**
+   * 订阅的主题和对应的消息处理回调
+   */
+  private readonly subscribeCbRecord: Record<string, OnMessageStringCb>
+
+  /**
    * 订阅的所有主题
    */
   public get subscribeList() {
-    return Object.keys(this.subscribeRecord)
+    return Object.keys(this.subscribeCbRecord)
   }
-
-  /**
-   * 订阅的主题和对应的消息处理回调
-   */
-  private readonly subscribeRecord: Record<string, OnMessageStringCb>
 
   constructor(options: MqttOptions) {
     this.client = mqtt.connect(options.address)
-    this.subscribeRecord = options.subscribe || {}
+    this.subscribeCbRecord = options.subscribe || {}
 
     if (options.subscribe) {
       Object.keys(options.subscribe).forEach((topic) => this.subscribe(topic))
 
       this.client.on('message', (topic, payloadBuffer) => {
-        const cb = this.subscribeRecord![topic]
+        const cb = this.subscribeCbRecord![topic]
         cb(topic, payloadBuffer.toString('utf-8'))
       })
     }
@@ -60,9 +60,9 @@ export default class MQTT implements MqttInterface {
   ): MqttClient {
     if (cb) {
       if (typeof topics === 'string') {
-        this.subscribeRecord[topics] = cb
+        this.subscribeCbRecord[topics] = cb
       } else {
-        topics.forEach((topic) => (this.subscribeRecord[topic] = cb))
+        topics.forEach((topic) => (this.subscribeCbRecord[topic] = cb))
       }
     }
     return this.client.subscribe(topics, { qos })
