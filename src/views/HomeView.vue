@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import mqtt from '@/mqtt'
+import { ref } from 'vue'
 
 interface ProductSeries {
   name: string
   bgUrl: string
 }
+
 const productSeries = ref<ProductSeries[]>([
   {
     name: '产品系列1',
@@ -36,12 +36,23 @@ const productSeries = ref<ProductSeries[]>([
 
 <template>
   <div id="main-container">
-    <div class="wrapper">
-      <div class="summary">特华得概况</div>
-      <div class="tech">匠心独运工艺</div>
+    <div class="grid">
+      <div class="summary">
+        <div class="big-title">特华得概况</div>
+        <img class="big-replay" src="/homepage/replayUnclick.png" />
+      </div>
+      <div class="tech">
+        <div class="big-title">匠心独运工艺</div>
+        <img class="big-replay" src="/homepage/replayUnclick.png" />
+      </div>
 
-      <div class="food">全球食品精选</div>
-      <div class="base">全国基地</div>
+      <div class="food">
+        <div class="big-title">全球食品精选</div>
+        <img class="big-replay" src="/homepage/replayUnclick.png" />
+      </div>
+      <div class="base">
+        <div class="big-title">全国基地</div>
+      </div>
 
       <div
         v-for="(item, index) in productSeries"
@@ -49,7 +60,13 @@ const productSeries = ref<ProductSeries[]>([
         :class="`product${index + 1}`"
         :style="`background-image:url('${item.bgUrl}');`"
       >
-        {{ item.name }}
+        <div class="small-title">
+          {{ item.name }}
+        </div>
+
+        <img class="replay" src="/homepage/replayUnclick.png" />
+
+        <img class="click" src="/homepage/hintUnclick.png" />
       </div>
     </div>
   </div>
@@ -61,7 +78,7 @@ const productSeries = ref<ProductSeries[]>([
   background-color: #ffffff;
   overflow: hidden;
 
-  .wrapper {
+  .grid {
     margin-top: 100px;
     padding: 50px 200px;
     height: calc(100% - 300px);
@@ -78,7 +95,22 @@ const productSeries = ref<ProductSeries[]>([
       'product1  product2  product3  product4  product5  product6';
     gap: 20px;
 
+    .big-title {
+      text-align: initial;
+      position: relative;
+      top: 50px;
+      left: 50px;
+    }
+
+    .big-replay {
+      position: absolute;
+      right: 35px;
+      bottom: 35px;
+      height: 70px;
+    }
+
     .summary {
+      position: relative;
       grid-area: summary;
       background-image: url('homepage/summary.png');
       background-size: contain;
@@ -86,6 +118,7 @@ const productSeries = ref<ProductSeries[]>([
     }
 
     .tech {
+      position: relative;
       grid-area: tech;
       background-image: url('homepage/tech.png');
       background-size: contain;
@@ -93,6 +126,7 @@ const productSeries = ref<ProductSeries[]>([
     }
 
     .food {
+      position: relative;
       grid-area: food;
       background-image: url('homepage/food.png');
       background-size: contain;
@@ -109,10 +143,32 @@ const productSeries = ref<ProductSeries[]>([
     // 使用循环来生成 product1 到 product6 的样式
     @for $i from 1 through 6 {
       .product#{$i} {
+        position: relative;
         background-size: contain;
         background-repeat: no-repeat;
         grid-area: product#{$i};
         background-color: #d0d0d0;
+
+        .small-title {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          top: 30px;
+        }
+
+        .replay {
+          height: 70px;
+          position: absolute;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        .click {
+          height: 70px;
+          position: absolute;
+          right: 12px;
+          bottom: 12px;
+        }
       }
     }
   }
