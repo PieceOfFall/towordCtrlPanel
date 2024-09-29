@@ -7,4 +7,11 @@ interface State {
   isLoop: boolean
 }
 
-export type { Target, Operation, State }
+interface SeriesState {
+  id: number
+  isPlay: boolean
+  isLoop: boolean
+  isMute: boolean
+}
+
+export type { Target, Operation, State, SeriesState }

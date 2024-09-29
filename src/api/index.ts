@@ -5,4 +5,12 @@ function ctrlVideo(target: Target, operation: Operation) {
   mqtt.publish(target, operation)
 }
 
-export { ctrlVideo }
+function ctrlSeries(targetIndex: number, operation: Operation) {
+  mqtt.publish('series', `${targetIndex}:${operation}`)
+}
+
+function ctrlMonitor(targetName: 'JangSu' | 'HeiLongJang') {
+  mqtt.publish('monitor', targetName)
+}
+
+export { ctrlVideo, ctrlSeries, ctrlMonitor }

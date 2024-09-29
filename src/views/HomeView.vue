@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ctrlVideo } from '@/api'
-import type { Target, State } from '@/api/types'
+import { ctrlVideo, ctrlSeries, ctrlMonitor } from '@/api'
+import type { Target, State, SeriesState } from '@/api/types'
 import useStore from '@/stores'
 import { storeToRefs } from 'pinia'
 import mqtt from '@/mqtt'
@@ -47,8 +47,11 @@ const productSeries = ref<ProductSeries[]>([
 
 // Pinia
 const videoStore = useStore().video
-const store = storeToRefs(videoStore)
+const seriesStore = useStore().series
+const storeVideo = storeToRefs(videoStore)
+const storeSeries = storeToRefs(seriesStore)
 
+/** 三个视频UI */
 const playUrl = '/homepage/play.png'
 const pauseUrl = '/homepage/pause.png'
 const muteUrl = '/homepage/mute.png'
@@ -77,33 +80,95 @@ const menu = reactive<Menu>({
   }
 })
 
-function reRender() {
+function reRenderVideo() {
   for (const item in menu) {
     if (Object.prototype.hasOwnProperty.call(menu, item)) {
       const targetItem = item as Target
-      menu[targetItem].audioSrc = store[targetItem].value.isMute ? muteUrl : unmuteUrl
-      menu[targetItem].loopSrc = store[targetItem].value.isLoop ? loopUrl : unloopUrl
+      menu[targetItem].audioSrc = storeVideo[targetItem].value.isMute ? muteUrl : unmuteUrl
+      menu[targetItem].loopSrc = storeVideo[targetItem].value.isLoop ? loopUrl : unloopUrl
     }
   }
 }
+
+// 启动时获取一次所有视频的播放状态
+onMounted(() => mqtt.publish('getVideoState', ''))
 
 mqtt.subscribe('state', 0, (_topic, payload) => {
   const state = JSON.parse(payload) as State
 
   // 更新pinia
-  Object.assign(store[state.target].value, state)
+  Object.assign(storeVideo[state.target].value, state)
 
   // 调整渲染
-  reRender()
+  reRenderVideo()
 })
 
-// 启动时获取一次所有视频的播放状态
-onMounted(() => {
-  mqtt.publish('getState', '')
+/** 监控UI */
+
+/** 产品系列UI */
+// 启动时获取一次所有系列产品播放器的播放状态
+onMounted(() => mqtt.publish('getSeriesState', ''))
+
+interface ViewSeriesState {
+  play: string
+  mute: string
+  loop: string
+}
+
+const seriesSrcs = reactive<Record<string, ViewSeriesState>>({
+  product1: {
+    play: pauseUrl,
+    mute: muteUrl,
+    loop: loopUrl
+  },
+  product2: {
+    play: pauseUrl,
+    mute: muteUrl,
+    loop: loopUrl
+  },
+  product3: {
+    play: pauseUrl,
+    mute: muteUrl,
+    loop: loopUrl
+  },
+  product4: {
+    play: pauseUrl,
+    mute: muteUrl,
+    loop: loopUrl
+  },
+  product5: {
+    play: pauseUrl,
+    mute: muteUrl,
+    loop: loopUrl
+  },
+  product6: {
+    play: pauseUrl,
+    mute: muteUrl,
+    loop: loopUrl
+  }
 })
 
-const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =>
-  (menu[target][srcTarget] = newSrc)
+mqtt.subscribe('seriesState', 0, (_topic, payload) => {
+  const seriesStates = JSON.parse(payload) as SeriesState[]
+
+  // 更新pinia
+  seriesStates.forEach((item, index) => {
+    Object.assign(storeSeries[`product${index + 1}`].value, item)
+  })
+
+  // 更新渲染
+  reRenderSeries()
+})
+
+function reRenderSeries() {
+  for (const item in seriesSrcs) {
+    if (Object.prototype.hasOwnProperty.call(seriesSrcs, item)) {
+      seriesSrcs[item].play = storeSeries[item].value.isPlay ? playUrl : pauseUrl
+      seriesSrcs[item].mute = storeSeries[item].value.isMute ? muteUrl : unmuteUrl
+      seriesSrcs[item].loop = storeSeries[item].value.isLoop ? loopUrl : unloopUrl
+    }
+  }
+}
 </script>
 
 <template>
@@ -138,23 +203,17 @@ const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =
       <div class="tech">
         <div class="big-title">匠心独运工艺</div>
         <div class="operation-box">
+          <img class="big-play" @touchstart="ctrlVideo('tech', 'play')" :src="menu.tech.playSrc" />
           <img
-            class="big-play"
-            @touchstart="changeSrc('tech', 'playSrc', '/public/homepage/pause.png')"
-            @touchend="changeSrc('tech', 'playSrc', '/public/homepage/play.png')"
-            :src="menu.tech.playSrc"
+            class="big-pause"
+            @touchstart="ctrlVideo('tech', 'pause')"
+            :src="menu.tech.pauseSrc"
           />
-          <img
-            class="big-mute"
-            @touchstart="changeSrc('tech', 'audioSrc', '/public/homepage/mute.png')"
-            @touchend="changeSrc('tech', 'audioSrc', '/public/homepage/unmute.png')"
-            :src="menu.tech.audioSrc"
-          />
+          <img class="big-mute" @touchstart="ctrlVideo('tech', 'mute')" :src="menu.tech.audioSrc" />
           <img
             class="big-replay"
-            @touchstart="changeSrc('tech', 'loopSrc', '/public/homepage/replayClick.png')"
-            @touchend="changeSrc('tech', 'loopSrc', '/public/homepage/replayUnclick.png')"
             :src="menu.tech.loopSrc"
+            @touchstart="ctrlVideo('tech', 'loop')"
           />
         </div>
       </div>
@@ -162,29 +221,29 @@ const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =
       <div class="food">
         <div class="big-title">全球食品精选</div>
         <div class="operation-box">
+          <img class="big-play" @touchstart="ctrlVideo('food', 'play')" :src="menu.food.playSrc" />
           <img
-            class="big-play"
-            @touchstart="changeSrc('food', 'playSrc', '/homepage/pause.png')"
-            @touchend="changeSrc('food', 'playSrc', '/homepage/play.png')"
-            :src="menu.food.playSrc"
+            class="big-pause"
+            @touchstart="ctrlVideo('food', 'pause')"
+            :src="menu.food.pauseSrc"
           />
-          <img
-            class="big-mute"
-            @touchstart="changeSrc('food', 'audioSrc', '/homepage/mute.png')"
-            @touchend="changeSrc('food', 'audioSrc', '/homepage/unmute.png')"
-            :src="menu.food.audioSrc"
-          />
+          <img class="big-mute" @touchstart="ctrlVideo('food', 'mute')" :src="menu.food.audioSrc" />
           <img
             class="big-replay"
-            @touchstart="changeSrc('food', 'loopSrc', '/homepage/replayClick.png')"
-            @touchend="changeSrc('food', 'loopSrc', '/homepage/replayUnclick.png')"
             :src="menu.food.loopSrc"
+            @touchstart="ctrlVideo('food', 'loop')"
           />
         </div>
       </div>
 
       <div class="base">
         <div class="big-title">全国基地</div>
+        <div id="monitor-ctrl">
+          <el-button type="primary" @touchstart="ctrlMonitor('JangSu')"> 江苏总部基地 </el-button>
+          <el-button type="primary" @touchstart="ctrlMonitor('HeiLongJang')">
+            黑龙江生产基地</el-button
+          >
+        </div>
       </div>
 
       <div
@@ -197,9 +256,25 @@ const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =
           {{ item.name }}
         </div>
 
-        <img class="replay" src="/homepage/replayUnclick.png" />
-
-        <img class="click" src="/homepage/hintUnclick.png" />
+        <div class="series-box">
+          <img
+            class="series-operation"
+            :src="seriesSrcs[`product${index + 1}`].play"
+            @touchstart="
+              ctrlSeries(index, storeSeries[`product${index + 1}`].value.isPlay ? 'pause' : 'play')
+            "
+          />
+          <img
+            class="series-operation"
+            :src="seriesSrcs[`product${index + 1}`].mute"
+            @touchstart="ctrlSeries(index, 'mute')"
+          />
+          <img
+            class="series-operation"
+            :src="seriesSrcs[`product${index + 1}`].loop"
+            @touchstart="ctrlSeries(index, 'loop')"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -233,6 +308,7 @@ const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =
       position: relative;
       top: 50px;
       left: 50px;
+      line-height: 21px;
     }
 
     .operation-box {
@@ -253,7 +329,7 @@ const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =
 
       .big-pause {
         height: 70px;
-        transform: scale(1.2);
+        transform: scale(1.01);
       }
 
       .big-mute {
@@ -293,11 +369,28 @@ const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =
     }
 
     .base {
+      position: relative;
       grid-area: base;
       background-image: url('homepage/base.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
+
+      #monitor-ctrl {
+        height: calc(100% - 21px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+
+        .el-button {
+          width: 500px;
+          height: 100px;
+          margin: auto;
+
+          font-size: 20px;
+          letter-spacing: 2px;
+        }
+      }
     }
 
     // 使用循环来生成 product1 到 product6 的样式
@@ -316,18 +409,16 @@ const changeSrc = (target: keyof Menu, srcTarget: keyof Video, newSrc: string) =
           top: 30px;
         }
 
-        .replay {
-          height: 70px;
+        .series-box {
           position: absolute;
-          top: 50%;
-          transform: translate(-50%, -50%);
-        }
+          bottom: 15px;
+          width: 100%;
+          display: flex;
+          justify-content: space-around;
 
-        .click {
-          height: 70px;
-          position: absolute;
-          right: 12px;
-          bottom: 12px;
+          .series-operation {
+            height: 60px;
+          }
         }
       }
     }

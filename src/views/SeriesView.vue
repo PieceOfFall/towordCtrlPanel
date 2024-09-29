@@ -1,4 +1,12 @@
-<script lang="ts"></script>
+<script setup lang="ts">
+import router from '@/router'
+import { ref } from 'vue'
+
+/**返回按钮 */
+const backSrc = ref('/backUnclick.png')
+const handleBackTouch = () => (backSrc.value = '/backClick.png')
+const handleBackTouchRemove = () => (backSrc.value = '/backUnclick.png')
+</script>
 
 <template>
   <div id="main-container">
@@ -17,7 +25,11 @@
     </div>
 
     <div id="go-back">
-      <img src="/backUnclick.png" alt="" />
+      <img
+        :src="backSrc"
+        @touchstart="handleBackTouch()"
+        @touchend="[handleBackTouchRemove(), router.push('/')]"
+      />
     </div>
   </div>
 </template>
@@ -45,7 +57,6 @@
     #photo {
       width: 900px;
       height: 900px;
-      background-color: green;
 
       img {
         height: 100%;
