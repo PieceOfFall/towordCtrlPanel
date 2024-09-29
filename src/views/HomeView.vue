@@ -10,6 +10,7 @@ interface ProductSeries {
   name: string
   bgUrl: string
 }
+
 interface Video {
   playSrc: string
   pauseSrc: string
@@ -239,8 +240,8 @@ function reRenderSeries() {
       <div class="base">
         <div class="big-title">全国基地</div>
         <div id="monitor-ctrl">
-          <el-button type="primary" @touchstart="ctrlMonitor('JangSu')"> 江苏总部基地 </el-button>
-          <el-button type="primary" @touchstart="ctrlMonitor('HeiLongJang')">
+          <el-button type="primary" @touchstart="ctrlMonitor('JiangSu')"> 江苏总部基地 </el-button>
+          <el-button type="primary" @touchstart="ctrlMonitor('HeiLongJiang')">
             黑龙江生产基地</el-button
           >
         </div>

@@ -9,7 +9,7 @@ function ctrlSeries(targetIndex: number, operation: Operation) {
   mqtt.publish('series', `${targetIndex}:${operation}`)
 }
 
-function ctrlMonitor(targetName: 'JangSu' | 'HeiLongJang') {
+function ctrlMonitor(targetName: 'JiangSu' | 'HeiLongJiang') {
   mqtt.publish('monitor', targetName)
 }
 
