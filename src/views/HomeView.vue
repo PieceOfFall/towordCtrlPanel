@@ -258,13 +258,9 @@ function reRenderSeries() {
         </div>
 
         <div class="series-box">
-          <img
-            class="series-operation"
-            :src="seriesSrcs[`product${index + 1}`].play"
-            @touchstart="
-              ctrlSeries(index, storeSeries[`product${index + 1}`].value.isPlay ? 'pause' : 'play')
-            "
-          />
+          <img class="series-operation" :src="playUrl" @touchstart="ctrlSeries(index, 'play')" style="transform: scale(1.2);" />
+          <img class="series-operation" :src="pauseUrl" @touchstart="ctrlSeries(index, 'pause')" />
+
           <img
             class="series-operation"
             :src="seriesSrcs[`product${index + 1}`].mute"
@@ -345,7 +341,7 @@ function reRenderSeries() {
     .summary {
       position: relative;
       grid-area: summary;
-      background-image: url('homepage/summary.png');
+      background-image: url('/homepage/summary.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
@@ -354,7 +350,7 @@ function reRenderSeries() {
     .tech {
       position: relative;
       grid-area: tech;
-      background-image: url('homepage/tech.png');
+      background-image: url('/homepage/tech.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
@@ -363,7 +359,7 @@ function reRenderSeries() {
     .food {
       position: relative;
       grid-area: food;
-      background-image: url('homepage/food.png');
+      background-image: url('/homepage/food.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
@@ -372,7 +368,7 @@ function reRenderSeries() {
     .base {
       position: relative;
       grid-area: base;
-      background-image: url('homepage/base.png');
+      background-image: url('/homepage/base.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
