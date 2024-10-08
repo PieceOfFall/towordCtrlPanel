@@ -6,45 +6,12 @@ import useStore from '@/stores'
 import { storeToRefs } from 'pinia'
 import mqtt from '@/mqtt'
 
-interface ProductSeries {
-  name: string
-  bgUrl: string
-}
-
-interface Video {
-  playSrc: string
-  pauseSrc: string
-  audioSrc: string
-  loopSrc: string
-}
-type Menu = Record<Target, Video>
-
-const productSeries = ref<ProductSeries[]>([
-  {
-    name: '产品系列1',
-    bgUrl: 'homepage/product1.png'
-  },
-  {
-    name: '产品系列2',
-    bgUrl: 'homepage/product2.png'
-  },
-  {
-    name: '产品系列3',
-    bgUrl: 'homepage/product3.png'
-  },
-  {
-    name: '产品系列4',
-    bgUrl: 'homepage/product4.png'
-  },
-  {
-    name: '产品系列5',
-    bgUrl: 'homepage/product5.png'
-  },
-  {
-    name: '产品系列6',
-    bgUrl: 'homepage/product6.png'
-  }
-])
+const playUrl = '/homepage/play.png'
+const pauseUrl = '/homepage/pause.png'
+const muteUrl = '/homepage/mute.png'
+const unmuteUrl = '/homepage/unmute.png'
+const unloopUrl = '/homepage/replayUnclick.png'
+const loopUrl = '/homepage/replayClick.png'
 
 // Pinia
 const videoStore = useStore().video
@@ -53,12 +20,14 @@ const storeVideo = storeToRefs(videoStore)
 const storeSeries = storeToRefs(seriesStore)
 
 /** 三个视频UI */
-const playUrl = '/homepage/play.png'
-const pauseUrl = '/homepage/pause.png'
-const muteUrl = '/homepage/mute.png'
-const unmuteUrl = '/homepage/unmute.png'
-const unloopUrl = '/homepage/replayUnclick.png'
-const loopUrl = '/homepage/replayClick.png'
+interface Video {
+  playSrc: string
+  pauseSrc: string
+  audioSrc: string
+  loopSrc: string
+}
+
+type Menu = Record<Target, Video>
 
 const menu = reactive<Menu>({
   summary: {
@@ -107,14 +76,46 @@ mqtt.subscribe('state', 0, (_topic, payload) => {
 /** 监控UI */
 
 /** 产品系列UI */
-// 启动时获取一次所有系列产品播放器的播放状态
-onMounted(() => mqtt.publish('getSeriesState', ''))
-
 interface ViewSeriesState {
   play: string
   mute: string
   loop: string
 }
+
+interface ProductSeries {
+  name: string
+  bgUrl: string
+}
+
+const productSeries = ref<ProductSeries[]>([
+  {
+    name: '产品系列1',
+    bgUrl: 'homepage/product1.png'
+  },
+  {
+    name: '产品系列2',
+    bgUrl: 'homepage/product2.png'
+  },
+  {
+    name: '产品系列3',
+    bgUrl: 'homepage/product3.png'
+  },
+  {
+    name: '产品系列4',
+    bgUrl: 'homepage/product4.png'
+  },
+  {
+    name: '产品系列5',
+    bgUrl: 'homepage/product5.png'
+  },
+  {
+    name: '产品系列6',
+    bgUrl: 'homepage/product6.png'
+  }
+])
+
+// 启动时获取一次所有系列产品播放器的播放状态
+onMounted(() => mqtt.publish('getSeriesState', ''))
 
 const seriesSrcs = reactive<Record<string, ViewSeriesState>>({
   product1: {
@@ -258,7 +259,12 @@ function reRenderSeries() {
         </div>
 
         <div class="series-box">
-          <img class="series-operation" :src="playUrl" @touchstart="ctrlSeries(index, 'play')" style="transform: scale(1.2);" />
+          <img
+            class="series-operation"
+            :src="playUrl"
+            @touchstart="ctrlSeries(index, 'play')"
+            style="transform: scale(1.2)"
+          />
           <img class="series-operation" :src="pauseUrl" @touchstart="ctrlSeries(index, 'pause')" />
 
           <img
@@ -285,19 +291,19 @@ function reRenderSeries() {
 
   .grid {
     margin-top: 100px;
-    padding: 50px 200px;
+    padding: 10px 10px;
     height: calc(100% - 300px);
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: 480px 480px 280px;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: 215px 215px 120px;
     text-align: center;
     color: #fcfeff;
     letter-spacing: 3px;
     font-weight: bold;
     grid-template-areas:
-      'summary   summary   summary   tech      tech      tech'
-      'food      food      food      base      base      base'
-      'product1  product2  product3  product4  product5  product6';
+      '. summary   summary   summary   tech      tech      tech .'
+      '. food      food      food      base      base      base .'
+      '. product1  product2  product3  product4  product5  product6 .';
     gap: 20px;
 
     .big-title {
@@ -305,36 +311,37 @@ function reRenderSeries() {
       position: relative;
       top: 50px;
       left: 50px;
-      line-height: 21px;
+      font-size: 12px;
+      line-height: 10px;
     }
 
     .operation-box {
       position: absolute;
       bottom: 0;
       right: 10px;
-      height: 80px;
+      height: 50px;
       width: 360px;
       text-align: initial;
       padding: 20px 0;
       display: flex;
-      justify-content: space-around;
+      justify-content: space-evenly;
 
       .big-play {
-        height: 70px;
+        height: 40px;
         transform: scale(1.2);
       }
 
       .big-pause {
-        height: 70px;
+        height: 40px;
         transform: scale(1.01);
       }
 
       .big-mute {
-        height: 70px;
+        height: 40px;
       }
 
       .big-replay {
-        height: 70px;
+        height: 40px;
       }
     }
 
@@ -377,13 +384,12 @@ function reRenderSeries() {
         height: calc(100% - 21px);
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
 
         .el-button {
-          width: 500px;
-          height: 100px;
+          width: 280px;
+          height: 70px;
           margin: auto;
-
+          transform: scale(0.6);
           font-size: 20px;
           letter-spacing: 2px;
         }
@@ -399,7 +405,10 @@ function reRenderSeries() {
         grid-area: product#{$i};
         background-color: #d0d0d0;
 
+        font-size: 13px;
+
         .small-title {
+          font-size: 8px;
           position: absolute;
           left: 50%;
           transform: translateX(-50%);
@@ -414,7 +423,7 @@ function reRenderSeries() {
           justify-content: space-around;
 
           .series-operation {
-            height: 60px;
+            height: 25px;
           }
         }
       }
