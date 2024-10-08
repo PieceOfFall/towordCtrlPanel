@@ -176,7 +176,7 @@ function reRenderSeries() {
 <template>
   <div id="main-container">
     <div class="grid">
-      <div class="summary">
+      <div class="video summary">
         <div class="big-title">特华得概况</div>
         <div class="operation-box">
           <img
@@ -202,7 +202,7 @@ function reRenderSeries() {
         </div>
       </div>
 
-      <div class="tech">
+      <div class="video tech">
         <div class="big-title">匠心独运工艺</div>
         <div class="operation-box">
           <img class="big-play" @touchstart="ctrlVideo('tech', 'play')" :src="menu.tech.playSrc" />
@@ -220,7 +220,7 @@ function reRenderSeries() {
         </div>
       </div>
 
-      <div class="food">
+      <div class="video food">
         <div class="big-title">全球食品精选</div>
         <div class="operation-box">
           <img class="big-play" @touchstart="ctrlVideo('food', 'play')" :src="menu.food.playSrc" />
@@ -238,7 +238,7 @@ function reRenderSeries() {
         </div>
       </div>
 
-      <div class="base">
+      <div class="video base">
         <div class="big-title">全国基地</div>
         <div id="monitor-ctrl">
           <el-button type="primary" @touchstart="ctrlMonitor('JiangSu')"> 江苏总部基地 </el-button>
@@ -290,12 +290,14 @@ function reRenderSeries() {
   overflow: hidden;
 
   .grid {
+    margin: auto;
     margin-top: 100px;
+    width: max-content;
     padding: 10px 10px;
     height: calc(100% - 300px);
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: 215px 215px 120px;
+    grid-template-columns: repeat(8, 4.1rem);
+    grid-template-rows: 7.5rem 7.5rem 120px;
     text-align: center;
     color: #fcfeff;
     letter-spacing: 3px;
@@ -345,40 +347,31 @@ function reRenderSeries() {
       }
     }
 
-    .summary {
+    .video {
       position: relative;
-      grid-area: summary;
-      background-image: url('/homepage/summary.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
+    }
+
+    .summary {
+      grid-area: summary;
+      background-image: url('/homepage/summary.png');
     }
 
     .tech {
-      position: relative;
       grid-area: tech;
       background-image: url('/homepage/tech.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-color: #d0d0d0;
     }
 
     .food {
-      position: relative;
       grid-area: food;
       background-image: url('/homepage/food.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-color: #d0d0d0;
     }
 
     .base {
-      position: relative;
       grid-area: base;
       background-image: url('/homepage/base.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-color: #d0d0d0;
 
       #monitor-ctrl {
         height: calc(100% - 21px);
