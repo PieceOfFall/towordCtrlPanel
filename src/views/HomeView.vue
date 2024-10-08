@@ -291,13 +291,12 @@ function reRenderSeries() {
   overflow: hidden;
 
   .grid {
-    margin-top: 100px;
     width: 100%;
-    padding: 10px 10px;
-    height: calc(100% - 100px);
+    height: 100%;
+    align-content: center;
     display: grid;
-    grid-template-columns: repeat(8, 10%);
-    grid-template-rows: 13.5rem 13.5rem 10vw;
+    grid-template-columns: repeat(8, calc(12.5% - 1rem));
+    grid-template-rows: 13.5rem 13.5rem calc(12.5vw - 1rem);
     text-align: center;
     color: #fcfeff;
     letter-spacing: 3px;
@@ -306,14 +305,14 @@ function reRenderSeries() {
       '. summary   summary   summary   tech      tech      tech .'
       '. food      food      food      base      base      base .'
       '. product1  product2  product3  product4  product5  product6 .';
-    gap: calc(20% / 7);
+    gap: 1rem;
 
     .big-title {
       text-align: initial;
       position: relative;
       top: 50px;
       left: 50px;
-      font-size: 12px;
+      font-size: 0.7rem;
       line-height: 10px;
     }
 
@@ -374,7 +373,7 @@ function reRenderSeries() {
       background-image: url('/homepage/base.png');
 
       #monitor-ctrl {
-        height: calc(100% - 21px);
+        height: calc(100% - 1rem);
         display: flex;
         flex-direction: column;
 
@@ -382,8 +381,7 @@ function reRenderSeries() {
           width: 280px;
           height: 70px;
           margin: auto;
-          transform: scale(0.6);
-          font-size: 20px;
+          font-size: 1rem;
           letter-spacing: 2px;
         }
       }
@@ -398,10 +396,8 @@ function reRenderSeries() {
         grid-area: product#{$i};
         background-color: #d0d0d0;
 
-        font-size: 13px;
-
         .small-title {
-          font-size: 8px;
+          font-size: 0.6rem;
           position: absolute;
           left: 50%;
           transform: translateX(-50%);
