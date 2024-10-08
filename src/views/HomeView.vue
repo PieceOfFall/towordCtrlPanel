@@ -286,18 +286,18 @@ function reRenderSeries() {
 <style lang="scss" scoped>
 #main-container {
   height: 100%;
+  width: 100%;
   background-color: #ffffff;
   overflow: hidden;
 
   .grid {
-    margin: auto;
     margin-top: 100px;
-    width: max-content;
+    width: 100%;
     padding: 10px 10px;
-    height: calc(100% - 300px);
+    height: calc(100% - 100px);
     display: grid;
-    grid-template-columns: repeat(8, 4.1rem);
-    grid-template-rows: 7.5rem 7.5rem 120px;
+    grid-template-columns: repeat(8, 10%);
+    grid-template-rows: 13.5rem 13.5rem 10vw;
     text-align: center;
     color: #fcfeff;
     letter-spacing: 3px;
@@ -306,7 +306,7 @@ function reRenderSeries() {
       '. summary   summary   summary   tech      tech      tech .'
       '. food      food      food      base      base      base .'
       '. product1  product2  product3  product4  product5  product6 .';
-    gap: 20px;
+    gap: calc(20% / 7);
 
     .big-title {
       text-align: initial;
@@ -349,7 +349,7 @@ function reRenderSeries() {
 
     .video {
       position: relative;
-      background-size: contain;
+      background-size: cover;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
     }
@@ -393,7 +393,7 @@ function reRenderSeries() {
     @for $i from 1 through 6 {
       .product#{$i} {
         position: relative;
-        background-size: contain;
+        background-size: cover;
         background-repeat: no-repeat;
         grid-area: product#{$i};
         background-color: #d0d0d0;
@@ -416,7 +416,7 @@ function reRenderSeries() {
           justify-content: space-around;
 
           .series-operation {
-            height: 25px;
+            height: 1.3rem;
           }
         }
       }
