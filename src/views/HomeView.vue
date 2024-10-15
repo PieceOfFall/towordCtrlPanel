@@ -178,6 +178,24 @@ function reRenderSeries() {
     <div class="grid">
       <div class="video summary">
         <div class="big-title">特华得概况</div>
+
+        <div class="ctrl-box">
+          <img
+            class="big-arrow"
+            src="/homepage/left.png"
+            @touchstart="ctrlVideo('summary', 'last')"
+          />
+          <img
+            class="big-head"
+            src="/homepage/head.png"
+            @touchstart="ctrlVideo('summary', 'head')"
+          />
+          <img
+            class="big-arrow"
+            src="/homepage/right.png"
+            @touchstart="ctrlVideo('summary', 'next')"
+          />
+        </div>
         <div class="operation-box">
           <img
             class="big-play"
@@ -204,6 +222,15 @@ function reRenderSeries() {
 
       <div class="video tech">
         <div class="big-title">匠心独运工艺</div>
+        <div class="ctrl-box">
+          <img class="big-arrow" src="/homepage/left.png" @touchstart="ctrlVideo('tech', 'last')" />
+          <img class="big-head" src="/homepage/head.png" @touchstart="ctrlVideo('tech', 'head')" />
+          <img
+            class="big-arrow"
+            src="/homepage/right.png"
+            @touchstart="ctrlVideo('tech', 'next')"
+          />
+        </div>
         <div class="operation-box">
           <img class="big-play" @touchstart="ctrlVideo('tech', 'play')" :src="menu.tech.playSrc" />
           <img
@@ -222,6 +249,15 @@ function reRenderSeries() {
 
       <div class="video food">
         <div class="big-title">全球食品精选</div>
+        <div class="ctrl-box">
+          <img class="big-arrow" src="/homepage/left.png" @touchstart="ctrlVideo('food', 'last')" />
+          <img class="big-head" src="/homepage/head.png" @touchstart="ctrlVideo('food', 'head')" />
+          <img
+            class="big-arrow"
+            src="/homepage/right.png"
+            @touchstart="ctrlVideo('food', 'next')"
+          />
+        </div>
         <div class="operation-box">
           <img class="big-play" @touchstart="ctrlVideo('food', 'play')" :src="menu.food.playSrc" />
           <img
@@ -257,6 +293,9 @@ function reRenderSeries() {
         <div class="small-title">
           {{ item.name }}
         </div>
+
+        <img class="left" src="/homepage/left.png" @touchstart="ctrlSeries(index, 'last')" />
+        <img class="right" src="/homepage/right.png" @touchstart="ctrlSeries(index, 'next')" />
 
         <div class="series-box">
           <img
@@ -294,17 +333,18 @@ function reRenderSeries() {
     width: 100%;
     height: 100%;
     align-content: center;
+    justify-content: center;
     display: grid;
-    grid-template-columns: repeat(8, calc(12.5% - 1rem));
-    grid-template-rows: 13.5rem 13.5rem calc(12.5vw - 1rem);
+    grid-template-columns: repeat(6, calc(calc(100% / 6) - 1rem));
+    grid-template-rows: 33.5% 33.5% calc(calc(100vw / 6) - 1rem);
     text-align: center;
     color: #fcfeff;
     letter-spacing: 3px;
     font-weight: bold;
     grid-template-areas:
-      '. summary   summary   summary   tech      tech      tech .'
-      '. food      food      food      base      base      base .'
-      '. product1  product2  product3  product4  product5  product6 .';
+      'summary   summary   summary   tech      tech      tech'
+      'food      food      food      base      base      base'
+      'product1  product2  product3  product4  product5  product6';
     gap: 1rem;
 
     .big-title {
@@ -316,34 +356,66 @@ function reRenderSeries() {
       line-height: 10px;
     }
 
+    .ctrl-box {
+      position: absolute;
+      bottom: 0;
+      right: 10px;
+      height: 50px;
+      width: 15rem;
+      text-align: initial;
+      padding: 20px 0;
+      display: flex;
+      justify-content: right;
+      gap: 1.5rem;
+
+      margin-bottom: 70px;
+    }
+
     .operation-box {
       position: absolute;
       bottom: 0;
       right: 10px;
       height: 50px;
-      width: 360px;
+      width: 15rem;
       text-align: initial;
       padding: 20px 0;
       display: flex;
-      justify-content: space-evenly;
+      justify-content: right;
+      gap: 1.5rem;
+    }
 
-      .big-play {
-        height: 40px;
-        transform: scale(1.2);
-      }
+    .big-play {
+      height: 1.7rem;
+      width: 1.7rem;
+      transform: scale(1.2);
+    }
 
-      .big-pause {
-        height: 40px;
-        transform: scale(1.01);
-      }
+    .big-pause {
+      height: 1.7rem;
+      width: 1.7rem;
+      transform: scale(1.01);
+    }
 
-      .big-mute {
-        height: 40px;
-      }
+    .big-mute {
+      width: 1.7rem;
+      height: 1.7rem;
+    }
 
-      .big-replay {
-        height: 40px;
-      }
+    .big-arrow {
+      width: 1.7rem;
+      height: 1.7rem;
+      transform: scaleX(0.6);
+    }
+
+    .big-replay {
+      width: 1.7rem;
+      height: 1.7rem;
+    }
+
+    .big-head {
+      width: 1.7rem;
+      height: 1.7rem;
+      transform: scaleX(1.4) scaleY(1.9);
     }
 
     .video {
@@ -351,6 +423,13 @@ function reRenderSeries() {
       background-size: cover;
       background-repeat: no-repeat;
       background-color: #d0d0d0;
+
+      .head {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
     }
 
     .summary {
@@ -397,11 +476,27 @@ function reRenderSeries() {
         background-color: #d0d0d0;
 
         .small-title {
-          font-size: 0.6rem;
+          font-size: 0.4rem;
           position: absolute;
           left: 50%;
           transform: translateX(-50%);
           top: 30px;
+        }
+
+        .left {
+          position: absolute;
+          height: 0.85rem;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        .right {
+          position: absolute;
+          height: 0.85rem;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
         }
 
         .series-box {
@@ -412,7 +507,7 @@ function reRenderSeries() {
           justify-content: space-around;
 
           .series-operation {
-            height: 1.3rem;
+            height: 0.85rem;
           }
         }
       }

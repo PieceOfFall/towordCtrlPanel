@@ -11,7 +11,8 @@
 
 body {
   -webkit-overflow-scrolling: touch;
-  overflow-scrolling: touch;
   user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
   overflow: hidden;
 }

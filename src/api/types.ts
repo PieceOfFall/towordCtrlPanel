@@ -1,5 +1,5 @@
 type Target = 'summary' | 'tech' | 'food'
-type Operation = 'play' | 'pause' | 'loop' | 'mute'
+type Operation = 'play' | 'pause' | 'loop' | 'mute' | 'last' | 'next' | 'head'
 
 interface State {
   target: Target
