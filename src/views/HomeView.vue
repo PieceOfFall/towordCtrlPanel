@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { interpolate } from 'd3-interpolate';
+import { Star } from '@element-plus/icons-vue';
 import { ctrlVideo, ctrlSeries, ctrlMonitor } from '@/api'
 import type { Target, State, SeriesState } from '@/api/types'
 import useStore from '@/stores'
 import { storeToRefs } from 'pinia'
 import mqtt from '@/mqtt'
+import { emit } from 'process';
 
 const playUrl = '/homepage/play.png'
 const pauseUrl = '/homepage/pause.png'
@@ -171,6 +174,42 @@ function reRenderSeries() {
     }
   }
 }
+
+/** 按钮长按 */
+const interpolateNumber = interpolate(0, 100)
+let pressTimerId: NodeJS.Timeout | null = null
+
+const isTouching = ref(false)
+const progress = ref(0)
+const interpolatedProgress = computed(() => interpolateNumber(progress.value))
+
+function longTouchStart() {
+  if (isTouching.value) return
+  isTouching.value = true
+  pressTimerId = setInterval(increaseProgress, 150);
+}
+
+function longTouchEnd(endFunction: typeof ctrlMonitor, ...params: Parameters<typeof ctrlMonitor>) {
+  if (!isTouching.value) return
+  if (pressTimerId !== null) {
+    clearInterval(pressTimerId)
+    pressTimerId = null
+
+    if (interpolatedProgress.value >= 100) {
+      endFunction(...params)
+    }
+  }
+
+  isTouching.value = false
+  progress.value = 0
+
+}
+
+function increaseProgress() {
+  if (progress.value < 1) {
+    progress.value = progress.value + 0.1 < 1 ? progress.value + 0.1 : 1
+  }
+}
 </script>
 
 <template>
@@ -180,43 +219,15 @@ function reRenderSeries() {
         <div class="big-title">特华得概况</div>
 
         <div class="ctrl-box">
-          <img
-            class="big-arrow"
-            src="/homepage/left.png"
-            @touchstart="ctrlVideo('summary', 'last')"
-          />
-          <img
-            class="big-head"
-            src="/homepage/head.png"
-            @touchstart="ctrlVideo('summary', 'head')"
-          />
-          <img
-            class="big-arrow"
-            src="/homepage/right.png"
-            @touchstart="ctrlVideo('summary', 'next')"
-          />
+          <img class="big-arrow" src="/homepage/left.png" @touchstart="ctrlVideo('summary', 'last')" />
+          <img class="big-head" src="/homepage/head.png" @touchstart="ctrlVideo('summary', 'head')" />
+          <img class="big-arrow" src="/homepage/right.png" @touchstart="ctrlVideo('summary', 'next')" />
         </div>
         <div class="operation-box">
-          <img
-            class="big-play"
-            @touchstart="ctrlVideo('summary', 'play')"
-            :src="menu.summary.playSrc"
-          />
-          <img
-            class="big-pause"
-            @touchstart="ctrlVideo('summary', 'pause')"
-            :src="menu.summary.pauseSrc"
-          />
-          <img
-            class="big-mute"
-            @touchstart="ctrlVideo('summary', 'mute')"
-            :src="menu.summary.audioSrc"
-          />
-          <img
-            class="big-replay"
-            :src="menu.summary.loopSrc"
-            @touchstart="ctrlVideo('summary', 'loop')"
-          />
+          <img class="big-play" @touchstart="ctrlVideo('summary', 'play')" :src="menu.summary.playSrc" />
+          <img class="big-pause" @touchstart="ctrlVideo('summary', 'pause')" :src="menu.summary.pauseSrc" />
+          <img class="big-mute" @touchstart="ctrlVideo('summary', 'mute')" :src="menu.summary.audioSrc" />
+          <img class="big-replay" :src="menu.summary.loopSrc" @touchstart="ctrlVideo('summary', 'loop')" />
         </div>
       </div>
 
@@ -225,25 +236,13 @@ function reRenderSeries() {
         <div class="ctrl-box">
           <img class="big-arrow" src="/homepage/left.png" @touchstart="ctrlVideo('tech', 'last')" />
           <img class="big-head" src="/homepage/head.png" @touchstart="ctrlVideo('tech', 'head')" />
-          <img
-            class="big-arrow"
-            src="/homepage/right.png"
-            @touchstart="ctrlVideo('tech', 'next')"
-          />
+          <img class="big-arrow" src="/homepage/right.png" @touchstart="ctrlVideo('tech', 'next')" />
         </div>
         <div class="operation-box">
           <img class="big-play" @touchstart="ctrlVideo('tech', 'play')" :src="menu.tech.playSrc" />
-          <img
-            class="big-pause"
-            @touchstart="ctrlVideo('tech', 'pause')"
-            :src="menu.tech.pauseSrc"
-          />
+          <img class="big-pause" @touchstart="ctrlVideo('tech', 'pause')" :src="menu.tech.pauseSrc" />
           <img class="big-mute" @touchstart="ctrlVideo('tech', 'mute')" :src="menu.tech.audioSrc" />
-          <img
-            class="big-replay"
-            :src="menu.tech.loopSrc"
-            @touchstart="ctrlVideo('tech', 'loop')"
-          />
+          <img class="big-replay" :src="menu.tech.loopSrc" @touchstart="ctrlVideo('tech', 'loop')" />
         </div>
       </div>
 
@@ -252,44 +251,46 @@ function reRenderSeries() {
         <div class="ctrl-box">
           <img class="big-arrow" src="/homepage/left.png" @touchstart="ctrlVideo('food', 'last')" />
           <img class="big-head" src="/homepage/head.png" @touchstart="ctrlVideo('food', 'head')" />
-          <img
-            class="big-arrow"
-            src="/homepage/right.png"
-            @touchstart="ctrlVideo('food', 'next')"
-          />
+          <img class="big-arrow" src="/homepage/right.png" @touchstart="ctrlVideo('food', 'next')" />
         </div>
         <div class="operation-box">
           <img class="big-play" @touchstart="ctrlVideo('food', 'play')" :src="menu.food.playSrc" />
-          <img
-            class="big-pause"
-            @touchstart="ctrlVideo('food', 'pause')"
-            :src="menu.food.pauseSrc"
-          />
+          <img class="big-pause" @touchstart="ctrlVideo('food', 'pause')" :src="menu.food.pauseSrc" />
           <img class="big-mute" @touchstart="ctrlVideo('food', 'mute')" :src="menu.food.audioSrc" />
-          <img
-            class="big-replay"
-            :src="menu.food.loopSrc"
-            @touchstart="ctrlVideo('food', 'loop')"
-          />
+          <img class="big-replay" :src="menu.food.loopSrc" @touchstart="ctrlVideo('food', 'loop')" />
         </div>
       </div>
 
       <div class="video base">
         <div class="big-title">全国基地</div>
+        <el-progress v-show="isTouching" :showText="false" :stroke-width="6" :width="80" type="circle"
+          :percentage="interpolatedProgress" />
         <div id="monitor-ctrl">
-          <el-button type="primary" @touchstart="ctrlMonitor('JiangSu')"> 江苏总部基地 </el-button>
-          <el-button type="primary" @touchstart="ctrlMonitor('HeiLongJiang')">
-            黑龙江生产基地</el-button
-          >
+          <div>
+            <el-button class="circle-button" type="primary" @touchstart="longTouchStart"
+              @touchend="longTouchEnd(ctrlMonitor, 'fake:JiangSu')">
+              <el-icon>
+                <Star />
+              </el-icon>
+            </el-button>
+            <el-button class="monitor-button" type="primary" @touchstart="ctrlMonitor('JiangSu')"> 江苏总部基地 </el-button>
+          </div>
+          <div>
+            <el-button class="circle-button" type="primary" @touchstart="longTouchStart"
+              @touchend="longTouchEnd(ctrlMonitor, 'fake:HeiLongJiang')">
+              <el-icon>
+                <Star />
+              </el-icon>
+            </el-button>
+            <el-button class="monitor-button" type="primary" @touchstart="ctrlMonitor('HeiLongJiang')">
+              黑龙江生产基地</el-button>
+          </div>
+
         </div>
       </div>
 
-      <div
-        v-for="(item, index) in productSeries"
-        :key="index"
-        :class="`product${index + 1}`"
-        :style="`background-image:url('${item.bgUrl}');`"
-      >
+      <div v-for="(item, index) in productSeries" :key="index" :class="`product${index + 1}`"
+        :style="`background-image:url('${item.bgUrl}');`">
         <div class="small-title">
           {{ item.name }}
         </div>
@@ -298,24 +299,14 @@ function reRenderSeries() {
         <img class="right" src="/homepage/right.png" @touchstart="ctrlSeries(index, 'next')" />
 
         <div class="series-box">
-          <img
-            class="series-operation"
-            :src="playUrl"
-            @touchstart="ctrlSeries(index, 'play')"
-            style="transform: scale(1.2)"
-          />
+          <img class="series-operation" :src="playUrl" @touchstart="ctrlSeries(index, 'play')"
+            style="transform: scale(1.2)" />
           <img class="series-operation" :src="pauseUrl" @touchstart="ctrlSeries(index, 'pause')" />
 
-          <img
-            class="series-operation"
-            :src="seriesSrcs[`product${index + 1}`].mute"
-            @touchstart="ctrlSeries(index, 'mute')"
-          />
-          <img
-            class="series-operation"
-            :src="seriesSrcs[`product${index + 1}`].loop"
-            @touchstart="ctrlSeries(index, 'loop')"
-          />
+          <img class="series-operation" :src="seriesSrcs[`product${index + 1}`].mute"
+            @touchstart="ctrlSeries(index, 'mute')" />
+          <img class="series-operation" :src="seriesSrcs[`product${index + 1}`].loop"
+            @touchstart="ctrlSeries(index, 'loop')" />
         </div>
       </div>
     </div>
@@ -448,21 +439,39 @@ function reRenderSeries() {
     }
 
     .base {
+      position: relative;
       grid-area: base;
       background-image: url('/homepage/base.png');
+
+      .el-progress {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+      }
 
       #monitor-ctrl {
         height: calc(100% - 1rem);
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        gap: 1.5rem;
 
-        .el-button {
-          width: 280px;
-          height: 70px;
-          margin: auto;
+        .monitor-button {
+          width: 8rem;
+          height: 2.5rem;
           font-size: 1rem;
           letter-spacing: 2px;
         }
+
+        .circle-button {
+          height: 2.5rem;
+          width: 2.5rem;
+
+          .el-icon {
+            font-size: 2rem;
+          }
+        }
+
       }
     }
 
