@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { interpolate } from 'd3-interpolate';
-import { Star } from '@element-plus/icons-vue';
+import {  Monitor } from '@element-plus/icons-vue';
 import { ctrlVideo, ctrlSeries, ctrlMonitor } from '@/api'
 import type { Target, State, SeriesState } from '@/api/types'
 import useStore from '@/stores'
 import { storeToRefs } from 'pinia'
 import mqtt from '@/mqtt'
-import { emit } from 'process';
 
 const playUrl = '/homepage/play.png'
 const pauseUrl = '/homepage/pause.png'
@@ -202,7 +201,6 @@ function longTouchEnd(endFunction: typeof ctrlMonitor, ...params: Parameters<typ
 
   isTouching.value = false
   progress.value = 0
-
 }
 
 function increaseProgress() {
@@ -263,26 +261,26 @@ function increaseProgress() {
 
       <div class="video base">
         <div class="big-title">全国基地</div>
-        <el-progress v-show="isTouching" :showText="false" :stroke-width="6" :width="80" type="circle"
+        <el-progress v-show="isTouching" :showText="false" :stroke-width="6" :width="50" type="circle"
           :percentage="interpolatedProgress" />
         <div id="monitor-ctrl">
           <div>
-            <el-button class="circle-button" type="primary" @touchstart="longTouchStart"
+            <el-button class="circle-button" type="info" @touchstart="longTouchStart"
               @touchend="longTouchEnd(ctrlMonitor, 'fake:JiangSu')">
               <el-icon>
-                <Star />
+                <Monitor />
               </el-icon>
             </el-button>
-            <el-button class="monitor-button" type="primary" @touchstart="ctrlMonitor('JiangSu')"> 江苏总部基地 </el-button>
+            <el-button class="monitor-button" type="info" @touchstart="ctrlMonitor('JiangSu')"> 江苏总部基地 </el-button>
           </div>
           <div>
-            <el-button class="circle-button" type="primary" @touchstart="longTouchStart"
+            <el-button class="circle-button" type="info" @touchstart="longTouchStart"
               @touchend="longTouchEnd(ctrlMonitor, 'fake:HeiLongJiang')">
               <el-icon>
-                <Star />
+                <Monitor />
               </el-icon>
             </el-button>
-            <el-button class="monitor-button" type="primary" @touchstart="ctrlMonitor('HeiLongJiang')">
+            <el-button class="monitor-button" type="info" @touchstart="ctrlMonitor('HeiLongJiang')">
               黑龙江生产基地</el-button>
           </div>
 
@@ -341,8 +339,8 @@ function increaseProgress() {
     .big-title {
       text-align: initial;
       position: relative;
-      top: 50px;
-      left: 50px;
+      top: 10px;
+      left: 10px;
       font-size: 0.7rem;
       line-height: 10px;
     }
@@ -406,7 +404,7 @@ function increaseProgress() {
     .big-head {
       width: 1.7rem;
       height: 1.7rem;
-      transform: scaleX(1.4) scaleY(1.9);
+      transform: scaleX(1) scaleY(1.25);
     }
 
     .video {
@@ -445,8 +443,8 @@ function increaseProgress() {
 
       .el-progress {
         position: absolute;
-        right: 1rem;
-        top: 1rem;
+        right: 0.1rem;
+        top: 0.1rem;
       }
 
       #monitor-ctrl {
